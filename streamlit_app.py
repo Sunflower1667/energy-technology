@@ -1,30 +1,17 @@
 import matplotlib.pyplot as plt
-import matplotlib
-import matplotlib.font_manager as fm
-font_path = '/usr/share/fonts/truetype/nanum/NanumGothic.ttf'
-fontprop = fm.FontProperties(fname=font_path)
-matplotlib.rc('font', family='NanumGothic')
-import io
-from PIL import Image
-import matplotlib.pyplot as plt
 import matplotlib.font_manager as fm
 import os
+import io
+from PIL import Image
 
-# 폰트 경로 지정
-font_path = os.path.join("fonts", "NanumGothic.ttf")
-
-# 폰트 등록
+font_path = os.path.join("fonts", "NanumGothic-Regular.ttf")
 fm.fontManager.addfont(font_path)
-
-# matplotlib 전역 설정
 plt.rcParams['font.family'] = 'NanumGothic'
-
-import matplotlib.font_manager as fm
+fontprop = fm.FontProperties(fname=font_path)
 import matplotlib.pyplot as plt
 import matplotlib
-font_path = '/usr/share/fonts/truetype/nanum/NanumGothic.ttf'
-fm.fontManager.addfont(font_path)
-matplotlib.rc('font', family='NanumGothic')
+font_path = '/usr/share/fonts/NanumGothic-Regular.ttf'
+matplotlib.rc('font', family='NanumGothic-Regular')
 
 import streamlit as st
 import pandas as pd
@@ -62,10 +49,10 @@ st.subheader("에너지 사용량 꺾은선 그래프")
 fig, ax = plt.subplots(figsize=(8, 5))
 for energy in energy_types:
 	ax.plot(df[df["에너지"] == energy]["연도"], df[df["에너지"] == energy]["사용량"], marker='o', label=energy)
-ax.set_xlabel("연도")
-ax.set_ylabel("사용량")
-ax.set_title("에너지 사용량 꺾은선 그래프")
-ax.legend()
+ax.set_xlabel("연도", fontproperties=fontprop)
+ax.set_ylabel("사용량", fontproperties=fontprop)
+ax.set_title("에너지 사용량 꺾은선 그래프", fontproperties=fontprop)
+ax.legend(prop=fontprop)
 st.pyplot(fig)
 
 
@@ -91,10 +78,10 @@ bar_df = diff_df.pivot(index="연도 변화", columns="에너지", values="사�
 
 fig2, ax2 = plt.subplots(figsize=(8, 5))
 bar_df.plot(kind='bar', ax=ax2)
-ax2.set_xlabel("연도 변화")
-ax2.set_ylabel("사용량 변화")
-ax2.set_title("연도별 에너지 사용량 변화 막대그래프")
-ax2.legend()
+ax2.set_xlabel("연도 변화", fontproperties=fontprop)
+ax2.set_ylabel("사용량 변화", fontproperties=fontprop)
+ax2.set_title("연도별 에너지 사용량 변화 막대그래프", fontproperties=fontprop)
+ax2.legend(prop=fontprop)
 st.pyplot(fig2)
 
 
@@ -105,7 +92,7 @@ fig_all, axs = plt.subplots(2, 2, figsize=(16, 10))
 # 학생 정보 텍스트
 axs[0, 0].axis('off')
 student_info = f"학번: {student_id}\n이름: {student_name}"
-axs[0, 0].text(0, 1, student_info, fontsize=16, va='top')
+axs[0, 0].text(0, 1, student_info, fontsize=16, va='top', fontproperties=fontprop)
 
 # 입력 표
 axs[0, 1].axis('off')
@@ -114,22 +101,22 @@ table = axs[0, 1].table(cellText=table_data, loc='center', cellLoc='center', col
 table.auto_set_font_size(False)
 table.set_fontsize(12)
 table.scale(1, 2)
-axs[0, 1].set_title('입력 데이터', fontsize=14)
+axs[0, 1].set_title('입력 데이터', fontsize=14, fontproperties=fontprop)
 
 # 꺾은선 그래프
 for energy in energy_types:
 	axs[1, 0].plot(df[df["에너지"] == energy]["연도"], df[df["에너지"] == energy]["사용량"], marker='o', label=energy)
-axs[1, 0].set_xlabel("연도")
-axs[1, 0].set_ylabel("사용량")
-axs[1, 0].set_title("에너지 사용량 꺾은선 그래프")
-axs[1, 0].legend()
+axs[1, 0].set_xlabel("연도", fontproperties=fontprop)
+axs[1, 0].set_ylabel("사용량", fontproperties=fontprop)
+axs[1, 0].set_title("에너지 사용량 꺾은선 그래프", fontproperties=fontprop)
+axs[1, 0].legend(prop=fontprop)
 
 # 막대그래프
 bar_df.plot(kind='bar', ax=axs[1, 1])
-axs[1, 1].set_xlabel("연도 변화")
-axs[1, 1].set_ylabel("사용량 변화")
-axs[1, 1].set_title("연도별 에너지 사용량 변화 막대그래프")
-axs[1, 1].legend()
+axs[1, 1].set_xlabel("연도 변화", fontproperties=fontprop)
+axs[1, 1].set_ylabel("사용량 변화", fontproperties=fontprop)
+axs[1, 1].set_title("연도별 에너지 사용량 변화 막대그래프", fontproperties=fontprop)
+axs[1, 1].legend(prop=fontprop)
 
 plt.tight_layout()
 
