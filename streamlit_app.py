@@ -1,151 +1,136 @@
+import matplotlib.pyplot as plt
+import matplotlib
+import matplotlib.font_manager as fm
+font_path = '/usr/share/fonts/truetype/nanum/NanumGothic.ttf'
+fontprop = fm.FontProperties(fname=font_path)
+matplotlib.rc('font', family='NanumGothic')
+import io
+from PIL import Image
+
+import matplotlib.font_manager as fm
+import matplotlib.pyplot as plt
+import matplotlib
+font_path = '/usr/share/fonts/truetype/nanum/NanumGothic.ttf'
+fm.fontManager.addfont(font_path)
+matplotlib.rc('font', family='NanumGothic')
+
 import streamlit as st
 import pandas as pd
-import math
-from pathlib import Path
 
-# Set the title and favicon that appear in the Browser's tab bar.
-st.set_page_config(
-    page_title='GDP dashboard',
-    page_icon=':earth_americas:', # This is an emoji shortcode. Could be a URL too.
-)
+st.set_page_config(page_title="친환경 에너지 발전 동향 파악하기", page_icon=":seedling:")
+st.title("친환경 에너지 발전 동향 파악하기")
 
-# -----------------------------------------------------------------------------
-# Declare some useful functions.
+# 학생 학번, 이름 입력
+student_id = st.text_input("학생 학번을 입력하세요")
+student_name = st.text_input("학생 이름을 입력하세요")
 
-@st.cache_data
-def get_gdp_data():
-    """Grab GDP data from a CSV file.
+# 최근 5년
+years = [2021, 2022, 2023, 2024, 2025]
+energy_types = ["원자력", "화력", "수력", "신재생"]
 
-    This uses caching to avoid having to read the file every time. If we were
-    reading from an HTTP endpoint instead of a file, it's a good idea to set
-    a maximum age to the cache with the TTL argument: @st.cache_data(ttl='1d')
-    """
+# 표 형태로 입력: editable dataframe
+st.subheader("최근 5년간 에너지 사용량 입력")
+default_data = {"연도": years}
+for energy in energy_types:
+	default_data[energy] = [0.0]*len(years)
+input_df = pd.DataFrame(default_data)
+edited_df = st.data_editor(input_df, num_rows="dynamic", use_container_width=True)
 
-    # Instead of a CSV on disk, you could read from an HTTP endpoint here too.
-    DATA_FILENAME = Path(__file__).parent/'data/gdp_data.csv'
-    raw_gdp_df = pd.read_csv(DATA_FILENAME)
-
-    MIN_YEAR = 1960
-    MAX_YEAR = 2022
-
-    # The data above has columns like:
-    # - Country Name
-    # - Country Code
-    # - [Stuff I don't care about]
-    # - GDP for 1960
-    # - GDP for 1961
-    # - GDP for 1962
-    # - ...
-    # - GDP for 2022
-    #
-    # ...but I want this instead:
-    # - Country Name
-    # - Country Code
-    # - Year
-    # - GDP
-    #
-    # So let's pivot all those year-columns into two: Year and GDP
-    gdp_df = raw_gdp_df.melt(
-        ['Country Code'],
-        [str(x) for x in range(MIN_YEAR, MAX_YEAR + 1)],
-        'Year',
-        'GDP',
-    )
-
-    # Convert years from string to integers
-    gdp_df['Year'] = pd.to_numeric(gdp_df['Year'])
-
-    return gdp_df
-
-gdp_df = get_gdp_data()
-
-# -----------------------------------------------------------------------------
-# Draw the actual page
-
-# Set the title that appears at the top of the page.
-'''
-# :earth_americas: GDP dashboard
-
-Browse GDP data from the [World Bank Open Data](https://data.worldbank.org/) website. As you'll
-notice, the data only goes to 2022 right now, and datapoints for certain years are often missing.
-But it's otherwise a great (and did I mention _free_?) source of data.
-'''
-
-# Add some spacing
-''
-''
-
-min_value = gdp_df['Year'].min()
-max_value = gdp_df['Year'].max()
-
-from_year, to_year = st.slider(
-    'Which years are you interested in?',
-    min_value=min_value,
-    max_value=max_value,
-    value=[min_value, max_value])
-
-countries = gdp_df['Country Code'].unique()
-
-if not len(countries):
-    st.warning("Select at least one country")
-
-selected_countries = st.multiselect(
-    'Which countries would you like to view?',
-    countries,
-    ['DEU', 'FRA', 'GBR', 'BRA', 'MEX', 'JPN'])
-
-''
-''
-''
-
-# Filter the data
-filtered_gdp_df = gdp_df[
-    (gdp_df['Country Code'].isin(selected_countries))
-    & (gdp_df['Year'] <= to_year)
-    & (from_year <= gdp_df['Year'])
-]
-
-st.header('GDP over time', divider='gray')
-
-''
-
-st.line_chart(
-    filtered_gdp_df,
-    x='Year',
-    y='GDP',
-    color='Country Code',
-)
-
-''
-''
+# melt하여 분석용 데이터프레임 생성
+df = edited_df.melt(id_vars=["연도"], value_vars=energy_types, var_name="에너지", value_name="사용량")
+df["학생"] = student_name
+df["학번"] = student_id
 
 
-first_year = gdp_df[gdp_df['Year'] == from_year]
-last_year = gdp_df[gdp_df['Year'] == to_year]
 
-st.header(f'GDP in {to_year}', divider='gray')
 
-''
 
-cols = st.columns(4)
+# 꺾은선 그래프: 에너지별, 연도별 사용량 (matplotlib)
+st.subheader("에너지 사용량 꺾은선 그래프")
+fig, ax = plt.subplots(figsize=(8, 5))
+for energy in energy_types:
+	ax.plot(df[df["에너지"] == energy]["연도"], df[df["에너지"] == energy]["사용량"], marker='o', label=energy)
+ax.set_xlabel("연도")
+ax.set_ylabel("사용량")
+ax.set_title("에너지 사용량 꺾은선 그래프")
+ax.legend()
+st.pyplot(fig)
 
-for i, country in enumerate(selected_countries):
-    col = cols[i % len(cols)]
 
-    with col:
-        first_gdp = first_year[first_year['Country Code'] == country]['GDP'].iat[0] / 1000000000
-        last_gdp = last_year[last_year['Country Code'] == country]['GDP'].iat[0] / 1000000000
 
-        if math.isnan(first_gdp):
-            growth = 'n/a'
-            delta_color = 'off'
-        else:
-            growth = f'{last_gdp / first_gdp:,.2f}x'
-            delta_color = 'normal'
 
-        st.metric(
-            label=f'{country} GDP',
-            value=f'{last_gdp:,.0f}B',
-            delta=growth,
-            delta_color=delta_color
-        )
+# 연도별 차이 계산 및 막대그래프 표시 (matplotlib)
+st.subheader("연도별 에너지 사용량 변화 막대그래프")
+diff_data = []
+for energy in energy_types:
+	energy_df = df[df["에너지"] == energy].sort_values("연도")
+	for idx in range(1, len(years)):
+		prev = energy_df[energy_df["연도"] == years[idx-1]]["사용량"].values
+		curr = energy_df[energy_df["연도"] == years[idx]]["사용량"].values
+		if len(prev) and len(curr):
+			diff = curr[0] - prev[0]
+			diff_data.append({
+				"에너지": energy,
+				"연도 변화": f"{years[idx-1]}→{years[idx]}",
+				"사용량 변화": diff
+			})
+diff_df = pd.DataFrame(diff_data)
+bar_df = diff_df.pivot(index="연도 변화", columns="에너지", values="사용량 변화")
+
+fig2, ax2 = plt.subplots(figsize=(8, 5))
+bar_df.plot(kind='bar', ax=ax2)
+ax2.set_xlabel("연도 변화")
+ax2.set_ylabel("사용량 변화")
+ax2.set_title("연도별 에너지 사용량 변화 막대그래프")
+ax2.legend()
+st.pyplot(fig2)
+
+
+# 전체 결과 JPG/PDF 저장 기능 (학생 정보, 표, 그래프 모두 포함)
+st.subheader("전체 결과 저장")
+fig_all, axs = plt.subplots(2, 2, figsize=(16, 10))
+
+# 학생 정보 텍스트
+axs[0, 0].axis('off')
+student_info = f"학번: {student_id}\n이름: {student_name}"
+axs[0, 0].text(0, 1, student_info, fontsize=16, va='top')
+
+# 입력 표
+axs[0, 1].axis('off')
+table_data = [input_df.columns.tolist()] + input_df.values.tolist()
+table = axs[0, 1].table(cellText=table_data, loc='center', cellLoc='center', colWidths=[0.15]*len(input_df.columns))
+table.auto_set_font_size(False)
+table.set_fontsize(12)
+table.scale(1, 2)
+axs[0, 1].set_title('입력 데이터', fontsize=14)
+
+# 꺾은선 그래프
+for energy in energy_types:
+	axs[1, 0].plot(df[df["에너지"] == energy]["연도"], df[df["에너지"] == energy]["사용량"], marker='o', label=energy)
+axs[1, 0].set_xlabel("연도")
+axs[1, 0].set_ylabel("사용량")
+axs[1, 0].set_title("에너지 사용량 꺾은선 그래프")
+axs[1, 0].legend()
+
+# 막대그래프
+bar_df.plot(kind='bar', ax=axs[1, 1])
+axs[1, 1].set_xlabel("연도 변화")
+axs[1, 1].set_ylabel("사용량 변화")
+axs[1, 1].set_title("연도별 에너지 사용량 변화 막대그래프")
+axs[1, 1].legend()
+
+plt.tight_layout()
+
+# JPG 저장
+img_buf = io.BytesIO()
+fig_all.savefig(img_buf, format='jpeg')
+img_buf.seek(0)
+st.download_button("전체 결과 JPG 다운로드", data=img_buf, file_name="energy_result.jpg", mime="image/jpeg")
+
+# PDF 저장
+pdf_buf = io.BytesIO()
+fig_all.savefig(pdf_buf, format='pdf')
+pdf_buf.seek(0)
+st.download_button("전체 결과 PDF 다운로드", data=pdf_buf, file_name="energy_result.pdf", mime="application/pdf")
+
+
