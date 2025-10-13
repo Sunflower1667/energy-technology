@@ -37,7 +37,7 @@ input_df = pd.DataFrame(default_data)
 edited_df = st.data_editor(input_df, num_rows="dynamic", use_container_width=True)
 
 # melt하여 분석용 데이터프레임 생성
-df = edited_df.melt(id_vars=["연도"], value_vars=energy_types, var_name="에너지", value_name="사용량")
+df = edited_df.melt(id_vars=["연도"], value_vars=energy_types, var_name="에너지", value_name="발전량")
 df["학생"] = student_name
 df["학번"] = student_id
 
