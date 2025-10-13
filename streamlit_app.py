@@ -6,11 +6,12 @@ from PIL import Image
 
 font_path = os.path.join("fonts", "NanumGothic-Regular.ttf")
 fm.fontManager.addfont(font_path)
-plt.rcParams['font.family'] = 'NanumGothic'
 fontprop = fm.FontProperties(fname=font_path)
+plt.rcParams['font.family'] = 'NanumGothic'
+
 import matplotlib.pyplot as plt
 import matplotlib
-font_path = '/usr/share/fonts/NanumGothic-Regular.ttf'
+
 matplotlib.rc('font', family='NanumGothic-Regular')
 
 import streamlit as st
