@@ -29,7 +29,7 @@ years = [2021, 2022, 2023, 2024, 2025]
 energy_types = ["원자력", "화력", "수력", "신재생"]
 
 # 표 형태로 입력: editable dataframe
-st.subheader("최근 5년간 에너지 사용량 입력(단위 : 천kW)")
+st.subheader("최근 5년간 에너지 발전량 입력(단위 : 천kW)")
 default_data = {"연도": years}
 for energy in energy_types:
 	default_data[energy] = [0.0]*len(years)
@@ -46,13 +46,13 @@ df["학번"] = student_id
 
 
 # 꺾은선 그래프: 에너지별, 연도별 사용량 (matplotlib)
-st.subheader("에너지 사용량 꺾은선 그래프")
+st.subheader("에너지 발전량 꺾은선 그래프")
 fig, ax = plt.subplots(figsize=(8, 5))
 for energy in energy_types:
-	ax.plot(df[df["에너지"] == energy]["연도"], df[df["에너지"] == energy]["사용량"], marker='o', label=energy)
+	ax.plot(df[df["에너지"] == energy]["연도"], df[df["에너지"] == energy]["발전량"], marker='o', label=energy)
 ax.set_xlabel("연도", fontproperties=fontprop)
-ax.set_ylabel("사용량", fontproperties=fontprop)
-ax.set_title("에너지 사용량 꺾은선 그래프", fontproperties=fontprop)
+ax.set_ylabel("발전량", fontproperties=fontprop)
+ax.set_title("에너지 발전량 꺾은선 그래프", fontproperties=fontprop)
 ax.legend(prop=fontprop)
 st.pyplot(fig)
 
@@ -60,28 +60,28 @@ st.pyplot(fig)
 
 
 # 연도별 차이 계산 및 막대그래프 표시 (matplotlib)
-st.subheader("연도별 에너지 사용량 변화 막대그래프")
+st.subheader("연도별 에너지 발전량 변화 막대그래프")
 diff_data = []
 for energy in energy_types:
 	energy_df = df[df["에너지"] == energy].sort_values("연도")
 	for idx in range(1, len(years)):
-		prev = energy_df[energy_df["연도"] == years[idx-1]]["사용량"].values
-		curr = energy_df[energy_df["연도"] == years[idx]]["사용량"].values
+		prev = energy_df[energy_df["연도"] == years[idx-1]]["발전량"].values
+		curr = energy_df[energy_df["연도"] == years[idx]]["발전량"].values
 		if len(prev) and len(curr):
 			diff = curr[0] - prev[0]
 			diff_data.append({
 				"에너지": energy,
 				"연도 변화": f"{years[idx-1]}→{years[idx]}",
-				"사용량 변화": diff
+				"발전량 변화": diff
 			})
 diff_df = pd.DataFrame(diff_data)
-bar_df = diff_df.pivot(index="연도 변화", columns="에너지", values="사용량 변화")
+bar_df = diff_df.pivot(index="연도 변화", columns="에너지", values="발전량 변화")
 
 fig2, ax2 = plt.subplots(figsize=(8, 5))
 bar_df.plot(kind='bar', ax=ax2)
 ax2.set_xlabel("연도 변화", fontproperties=fontprop)
-ax2.set_ylabel("사용량 변화", fontproperties=fontprop)
-ax2.set_title("연도별 에너지 사용량 변화 막대그래프", fontproperties=fontprop)
+ax2.set_ylabel("발전량 변화", fontproperties=fontprop)
+ax2.set_title("연도별 에너지 발전량 변화 막대그래프", fontproperties=fontprop)
 ax2.legend(prop=fontprop)
 st.pyplot(fig2)
 
@@ -106,17 +106,17 @@ axs[0, 1].set_title('입력 데이터', fontsize=14, fontproperties=fontprop)
 
 # 꺾은선 그래프
 for energy in energy_types:
-	axs[1, 0].plot(df[df["에너지"] == energy]["연도"], df[df["에너지"] == energy]["사용량"], marker='o', label=energy)
+	axs[1, 0].plot(df[df["에너지"] == energy]["연도"], df[df["에너지"] == energy]["발전량"], marker='o', label=energy)
 axs[1, 0].set_xlabel("연도", fontproperties=fontprop)
-axs[1, 0].set_ylabel("사용량", fontproperties=fontprop)
-axs[1, 0].set_title("에너지 사용량 꺾은선 그래프", fontproperties=fontprop)
+axs[1, 0].set_ylabel("발전량", fontproperties=fontprop)
+axs[1, 0].set_title("에너지 발전량 꺾은선 그래프", fontproperties=fontprop)
 axs[1, 0].legend(prop=fontprop)
 
 # 막대그래프
 bar_df.plot(kind='bar', ax=axs[1, 1])
 axs[1, 1].set_xlabel("연도 변화", fontproperties=fontprop)
-axs[1, 1].set_ylabel("사용량 변화", fontproperties=fontprop)
-axs[1, 1].set_title("연도별 에너지 사용량 변화 막대그래프", fontproperties=fontprop)
+axs[1, 1].set_ylabel("발전량 변화", fontproperties=fontprop)
+axs[1, 1].set_title("연도별 에너지 발전량 변화 막대그래프", fontproperties=fontprop)
 axs[1, 1].legend(prop=fontprop)
 
 plt.tight_layout()
