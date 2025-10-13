@@ -103,6 +103,8 @@ table.auto_set_font_size(False)
 table.set_fontsize(12)
 table.scale(1, 2)
 axs[0, 1].set_title('입력 데이터', fontsize=14, fontproperties=fontprop)
+for key, cell in table.get_celld().items():
+    cell.get_text().set_fontproperties(fontprop)
 
 # 꺾은선 그래프
 for energy in energy_types:
