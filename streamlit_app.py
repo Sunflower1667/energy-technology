@@ -6,6 +6,18 @@ fontprop = fm.FontProperties(fname=font_path)
 matplotlib.rc('font', family='NanumGothic')
 import io
 from PIL import Image
+import matplotlib.pyplot as plt
+import matplotlib.font_manager as fm
+import os
+
+# 폰트 경로 지정
+font_path = os.path.join("fonts", "NanumGothic.ttf")
+
+# 폰트 등록
+fm.fontManager.addfont(font_path)
+
+# matplotlib 전역 설정
+plt.rcParams['font.family'] = 'NanumGothic'
 
 import matplotlib.font_manager as fm
 import matplotlib.pyplot as plt
