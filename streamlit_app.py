@@ -29,7 +29,7 @@ years = [2021, 2022, 2023, 2024, 2025]
 energy_types = ["원자력", "화력", "수력", "신재생"]
 
 # 표 형태로 입력: editable dataframe
-st.subheader("최근 5년간 에너지 사용량 입력")
+st.subheader("최근 5년간 에너지 사용량 입력(단위 : 천kW)")
 default_data = {"연도": years}
 for energy in energy_types:
 	default_data[energy] = [0.0]*len(years)
