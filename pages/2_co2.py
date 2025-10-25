@@ -4,6 +4,7 @@ import base64
 from io import BytesIO
 import math, os
 import streamlit.components.v1 as components
+import fpdf
 
 st.title("🌍 탄소 절감 효과 계산기")
 
@@ -49,7 +50,7 @@ for r in range(rings):
         angle = 2 * math.pi * i / trees_in_ring
         x = center_x + radius * math.cos(angle)
         y = center_y + radius * math.sin(angle)
-        size = 50 + r * 3  # 바깥쪽일수록 조금 크게
+        size = 50 + r * 4  # 바깥쪽일수록 조금 크게
         html_trees += f"""
             <img src="data:image/png;base64,{b64_tree}" 
                  style="position:absolute;
@@ -83,6 +84,43 @@ html_container = f"""
 
 # 6️⃣ Streamlit에서 렌더링
 components.html(html_container, height=420, scrolling=False)
+
+# PDF 및 JPG 저장 버튼 추가
+st.header("결과 저장")
+
+# PDF 저장 버튼
+if st.button("PDF로 저장"):
+    pdf = fpdf.FPDF()
+    pdf.add_page()
+    pdf.set_font("Arial", size=12)
+    pdf.cell(200, 10, txt="탄소 절감 효과 계산 결과", ln=True, align='C')
+    pdf.cell(200, 10, txt=f"누적 발전량: {energy_kWh} kWh", ln=True)
+    pdf.cell(200, 10, txt=f"절감된 CO₂량: {CO2_saved:.2f} kg", ln=True)
+    pdf.cell(200, 10, txt=f"상응하는 나무 수: {trees:.2f} 그루", ln=True)
+
+    pdf_output_path = "co2_savings.pdf"
+    pdf.output(pdf_output_path)
+    st.success(f"PDF로 저장되었습니다: {pdf_output_path}")
+    with open(pdf_output_path, "rb") as file:
+        st.download_button(
+            label="PDF 다운로드",
+            data=file,
+            file_name=pdf_output_path,
+            mime="application/pdf"
+        )
+
+# JPG 저장 버튼
+if st.button("JPG로 저장"):
+    jpg_output_path = "co2_savings.jpg"
+    tree_img.save(jpg_output_path)
+    st.success(f"JPG로 저장되었습니다: {jpg_output_path}")
+    with open(jpg_output_path, "rb") as file:
+        st.download_button(
+            label="JPG 다운로드",
+            data=file,
+            file_name=jpg_output_path,
+            mime="image/jpeg"
+        )
 
 if tree_count > max_trees:
     st.caption(f"표시 제한: {max_trees}그루 (총 {tree_count}그루 중)")
