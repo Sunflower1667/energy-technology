@@ -31,13 +31,22 @@ st.markdown("""
 """)
 
 # -------------------------------
-# ✅ 학생 정보 입력
+# ✅ 학번/이름 입력 (전역 공유)
 # -------------------------------
-col1, col2 = st.columns(2)
-with col1:
-    student_id = st.text_input("학번", "")
-with col2:
-    student_name = st.text_input("이름", "")
+st.sidebar.header("👤 사용자 정보")
+st.sidebar.info("입력한 학번과 이름은 모든 페이지에서 자동으로 적용됩니다.")
+
+st.sidebar.text_input("이름", key="student_name")
+st.sidebar.text_input("학번", key="student_id")
+
+# 값이 입력되지 않으면 경고
+if not st.session_state.get("student_name") or not st.session_state.get("student_id"):
+    st.warning("👈 왼쪽 사이드바에서 이름과 학번을 입력해주세요.")
+    st.stop()
+
+# 변수로 가져오기 (코드 가독성 위해)
+student_name = st.session_state.student_name
+student_id = st.session_state.student_id
 
 # -------------------------------
 # ✅ 발전량 입력
