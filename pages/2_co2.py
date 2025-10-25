@@ -21,8 +21,8 @@ tree_img.save(buf, format="PNG")
 b64_tree = base64.b64encode(buf.getvalue()).decode()
 
 # 3️⃣ 계산
-energy = st.number_input("누적 발전량 (Wh)", min_value=0, value=10000)
-energy_kWh = energy / 1000
+energy = st.number_input("누적 발전량 (kWh)", min_value=0, value=10000)
+energy_kWh = energy
 CO2_saved = energy_kWh * 0.424
 trees = CO2_saved / 22
 st.metric("절감된 CO₂량 (kg)", f"{CO2_saved:.2f}")

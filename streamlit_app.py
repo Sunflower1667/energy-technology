@@ -77,7 +77,7 @@ st.pyplot(fig)
 # ✅ 개인 생각 작성 섹션
 # -------------------------------
 st.markdown("---")
-st.subheader("개인 생각 정리")
+st.subheader("생각 정리")
 
 with st.form("reflection"):
     q1 = st.text_area("① 어떤 발전원이 늘거나 줄었나요? 그 이유는 무엇이라고 생각하나요?", height=120)
@@ -147,7 +147,7 @@ axs[1, 0].legend(prop=fontprop)
 axs[1, 1].axis('off')
 thoughts = f"① {q1}\n\n② {q2}\n\n③ {q3}"
 axs[1, 1].text(0, 1, thoughts, fontsize=12, va='top', fontproperties=fontprop)
-axs[1, 1].set_title('학생 생각 요약', fontsize=14, fontproperties=fontprop)
+axs[1, 1].set_title('생각 정리', fontsize=14, fontproperties=fontprop)
 
 # JPG 다운로드
 img_buf = io.BytesIO()
